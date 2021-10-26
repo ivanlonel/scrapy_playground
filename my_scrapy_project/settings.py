@@ -53,7 +53,7 @@ ROBOTSTXT_OBEY = False
 DOWNLOADER_MIDDLEWARES = {
     # 'my_scrapy_project.middlewares.MyScrapyProjectDownloaderMiddleware': 543,
     'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-    'httpbin.middlewares.TooManyRequestsRetryMiddleware': 550
+    'my_scrapy_project.middlewares.TooManyRequestsRetryMiddleware': 550
 }
 
 # Enable or disable extensions
