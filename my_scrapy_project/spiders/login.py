@@ -25,21 +25,22 @@ class LoginSpider(scrapy.Spider):
         ensures only the first spider will proceed without waiting for cookies.
         """
 
-        LoginSpider.__lock.acquire()
-        try:
-            if LoginSpider.__first_spider_opened:
-                while not LoginSpider.__cookies:
-                    await async_sleep(1)
-                if LoginSpider.__cookies == self.COOKIE_ERROR:
-                    # https://github.com/scrapy/scrapy/issues/3435
-                    try:
-                        await self.crawler.engine.close_spider(spider, 'Unable to obtain session cookies')
-                    except RuntimeError as e:
-                        self.logger.debug(f'engine.close_spider raised {e!r}')
-            else:
+        async with LoginSpider.__lock:
+            if not LoginSpider.__first_spider_opened:
                 LoginSpider.__first_spider_opened = True
-        finally:
-            LoginSpider.__lock.release()
+                return
+
+        while not LoginSpider.__cookies:
+            await async_sleep(1)
+
+        if LoginSpider.__cookies == self.COOKIE_ERROR:
+            # In a future Scrapy version, we might be able to raise CloseSpider here.
+            # https://github.com/scrapy/scrapy/issues/3435#issuecomment-818700107
+            try:
+                await self.crawler.engine.close_spider(spider, 'Unable to obtain session cookies')
+            except RuntimeError as e:
+                # Engine no longer running. Just log it.
+                self.logger.debug(f'engine.close_spider raised {e!r}')
 
     def start_requests(self):
         """
