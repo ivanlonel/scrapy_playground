@@ -1,2 +1,2 @@
-scrapy~=2.5.1
+scrapy~=2.6.1
 twisted~=22.1.0
