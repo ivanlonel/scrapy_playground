@@ -1,2 +1,2 @@
 scrapy~=2.6.1
-twisted~=22.1.0
+twisted~=22.2.0
